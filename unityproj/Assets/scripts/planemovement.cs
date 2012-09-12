@@ -61,7 +61,7 @@ public class planemovement : MonoBehaviour {
 
         // Calculate the rotation needed for this target look vector.
         Quaternion rot = Quaternion.LookRotation(lookDirection.normalized);
-        
+
         // Get the current distance between the object and its target.
         float dist = Vector3.Distance(transform.position, currentTarget.position);
         
@@ -75,10 +75,37 @@ public class planemovement : MonoBehaviour {
         //         target. In those cases, even though it might be far away, we
         //         should increase the turn speed too.
         float finalTurnSpeed = Mathf.Lerp(maxTurnSpeed, minTurnSpeed, norm);
-        
+
+        // Attempt at banking.
+        //
+        /*
+        Vector3 t = currentTarget.position - transform.position;
+        Vector3 f = transform.forward;
+
+        t.Normalize();
+
+        float angle = Vector3.Angle(f, t);
+        //float angle = Quaternion.Dot(rot, transform.rotation);
+
+        float angleNorm = angle / 90;
+
+        float bank = angleNorm * 60.0f;
+
+        if( Vector3.Dot( t, f ) < 0 )
+        {
+            bank *= -1;
+        }
+
+        Debug.Log(angle + ", " + bank);
+
+        //float bank = (finalTurnSpeed / maxTurnSpeed) * 30.0f;
+        Quaternion rot = Quaternion.LookRotation(lookDirection.normalized) *
+                         Quaternion.AngleAxis(bank, Vector3.forward);
+        */
+
         // Rotate towards that target rotation based on the turn speed.
         transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * finalTurnSpeed);
-        
+
         // With the rotation complete, just move forward.
         transform.Translate(new Vector3(0,0,moveSpeed) * Time.deltaTime);
         
