@@ -27,6 +27,24 @@ public class planemovement : MonoBehaviour {
     public float maxTurnSpeed = 1.0f;
 
     /// <summary>
+    /// The maximum angle in degrees that the plane can rotate when banking.
+    /// </summary>
+    public float maxBank = 90.0f;
+
+    /// <summary>
+    /// The maximum changing in banking rotation per second. This will prevent the
+    /// plane from instantly jumping to fulling banked on sharp turns.
+    /// </summary>
+    public float maxBankSpeed = 1.0f;
+
+    /// <summary>
+    /// The banking math requires that the model be a child of another gameobject.
+    /// Translation and rotation around the Y is done on the parent, while banking
+    /// (aka rotation around the forward) is dont on this child.
+    /// </summary>
+    public Transform childForBanking;
+
+    /// <summary>
     /// Tracks which target is currently being flown to. This
     /// is an index into targets.
     /// </summary>
@@ -48,9 +66,9 @@ public class planemovement : MonoBehaviour {
     {
         distFromPreviousToCurrent = Vector3.Distance(transform.position, targets[currentTargetIndex].position);
     }
-    
+
     // Update is called once per frame
-    void Update () 
+    void Update( )
     {
         // Get the current target.
         Transform currentTarget = targets[currentTargetIndex];
@@ -76,32 +94,19 @@ public class planemovement : MonoBehaviour {
         //         should increase the turn speed too.
         float finalTurnSpeed = Mathf.Lerp(maxTurnSpeed, minTurnSpeed, norm);
 
-        // Attempt at banking.
-        //
-        /*
-        Vector3 t = currentTarget.position - transform.position;
-        Vector3 f = transform.forward;
+        // Based on the angle to the target, calculate how much we should bank.
+        // Sharper turns call for more banking.
+        float finalBankAmount = maxBank * -Vector3.Dot(transform.right, lookDirection.normalized);
 
-        t.Normalize();
-
-        float angle = Vector3.Angle(f, t);
-        //float angle = Quaternion.Dot(rot, transform.rotation);
-
-        float angleNorm = angle / 90;
-
-        float bank = angleNorm * 60.0f;
-
-        if( Vector3.Dot( t, f ) < 0 )
-        {
-            bank *= -1;
-        }
-
-        Debug.Log(angle + ", " + bank);
-
-        //float bank = (finalTurnSpeed / maxTurnSpeed) * 30.0f;
-        Quaternion rot = Quaternion.LookRotation(lookDirection.normalized) *
-                         Quaternion.AngleAxis(bank, Vector3.forward);
-        */
+        // Rotate the CHILD game object around its forward vector. We rotate the child to
+        // keep that rotation local to the forward vector, and not mess with the rotation
+        // which is turning the plane towards its target.
+        // The slerp is used to blend into the rotation other wise sharp turns cause the
+        // plane to jump to a high banking value.
+        childForBanking.localRotation = Quaternion.Slerp(
+            childForBanking.localRotation,
+            Quaternion.AngleAxis(finalBankAmount, Vector3.forward),
+            Time.deltaTime * maxBankSpeed);
 
         // Rotate towards that target rotation based on the turn speed.
         transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * finalTurnSpeed);
