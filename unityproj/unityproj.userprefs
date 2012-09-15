@@ -2,7 +2,7 @@
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="Assets\scripts\planemovement.cs">
     <Files>
-      <File FileName="Assets\scripts\planemovement.cs" Line="101" Column="66" />
+      <File FileName="Assets\scripts\planemovement.cs" Line="78" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -47,6 +47,8 @@
           <Value>transform.rotation</Value>
           <Value>rot</Value>
           <Value>dist</Value>
+          <Value>currentTarget.position</Value>
+          <Value>transform.position</Value>
         </State>
       </Pad>
     </Pads>

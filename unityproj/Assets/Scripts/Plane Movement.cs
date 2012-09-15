@@ -1,12 +1,15 @@
 using UnityEngine;
 using System.Collections;
 
-public class planemovement : MonoBehaviour {
+/// <summary>
+/// Controls the basic movement of a plane from one point to another.
+/// </summary>
+public class PlaneMovement : MonoBehaviour {
 
     /// <summary>
     /// The speed at which the plane travels every frame.
     /// </summary>
-    public float moveSpeed = 10;
+    public float moveSpeed = 10.0f;
 
     /// <summary>
     /// A list of target to fly towards in, in the order provided.
@@ -61,13 +64,17 @@ public class planemovement : MonoBehaviour {
     /// </summary>
     private float distFromPreviousToCurrent = 0.0f;
     
-    // Use this for initialization
-    void Start () 
+    /// <summary>
+    /// Start this instance.
+    /// </summary>
+    void Start( )
     {
         distFromPreviousToCurrent = Vector3.Distance(transform.position, targets[currentTargetIndex].position);
     }
 
-    // Update is called once per frame
+    /// <summary>
+    /// Update is called once per frame
+    /// </summary>
     void Update( )
     {
         // Get the current target.
