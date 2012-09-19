@@ -4,6 +4,7 @@ ModelImporter:
   fileIDToRecycleName:
     4300000: pfalzDIIIFuselage
     4300002: pfalzDIIIPropeller
+    4300004: PfalzDIIIPropeller
     7400000: Take 001 //// pfalzDIII
   serializedVersion: 10
   materials:
@@ -49,6 +50,19 @@ ModelImporter:
       data:
         first: 111
         second: 605fa900
+    PfalzDIIIPropeller:
+      data:
+        first: 1
+        second: a2860100
+      data:
+        first: 4
+        second: 821a0600
+      data:
+        first: 23
+        second: 60182300
+      data:
+        first: 33
+        second: a05a3200
     pfalzDIIIFuselage:
       data:
         first: 1
@@ -62,16 +76,3 @@ ModelImporter:
       data:
         first: 33
         second: a25a3200
-    pfalzDIIIPropeller:
-      data:
-        first: 1
-        second: a2860100
-      data:
-        first: 4
-        second: 821a0600
-      data:
-        first: 23
-        second: 60182300
-      data:
-        first: 33
-        second: a05a3200
