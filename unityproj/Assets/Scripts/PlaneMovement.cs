@@ -63,6 +63,8 @@ public class PlaneMovement : MonoBehaviour {
     /// The distance from the previous target to the current target.
     /// </summary>
     private float distFromPreviousToCurrent = 0.0f;
+
+    private bool hasTarget = true;
     
     /// <summary>
     /// Start this instance.
@@ -77,6 +79,12 @@ public class PlaneMovement : MonoBehaviour {
     /// </summary>
     void Update( )
     {
+        if( false == hasTarget )
+        {
+// Early return.
+            return;
+        }
+
         // Get the current target.
         Transform currentTarget = targets[currentTargetIndex];
         
@@ -124,16 +132,23 @@ public class PlaneMovement : MonoBehaviour {
         // If we get close to the target, switch to the next target.
         if( Vector3.Distance(transform.position, currentTarget.position) < minDist )
         {
-            currentTargetIndex++;
-            
-            // Loop around to the first target when reaching the end of the list.
-            if( currentTargetIndex >= targets.Length )
-            {
-                currentTargetIndex = 0;
-            }
-
-            // We have a new target so update to distance stored.
-            distFromPreviousToCurrent = Vector3.Distance(transform.position, targets[currentTargetIndex].position);
+            hasTarget = false;
         }
+    }
+
+    public void AdvanceTarget( )
+    {
+        hasTarget = true;
+
+        currentTargetIndex++;
+
+        // Loop around to the first target when reaching the end of the list.
+        if( currentTargetIndex >= targets.Length )
+        {
+            currentTargetIndex = 0;
+        }
+
+        // We have a new target so update to distance stored.
+        distFromPreviousToCurrent = Vector3.Distance(transform.position, targets[currentTargetIndex].position);
     }
 }

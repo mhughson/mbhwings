@@ -21,6 +21,12 @@ public class HUD : MonoBehaviour {
         if ( GUI.Button( new Rect ( xPos, yPos, buttonWidth, buttonHeight), "Left (Sharp)" ) )
         {
             print ("Left (Sharp) Clicked.");
+
+            GameObject player = GameObject.FindGameObjectWithTag( "Player" );
+
+            PlaneMovement someScript;
+            someScript = player.GetComponent<PlaneMovement>();
+            someScript.AdvanceTarget( );
         }
 
         xPos += xSpace;
