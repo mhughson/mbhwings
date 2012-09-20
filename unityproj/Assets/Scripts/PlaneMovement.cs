@@ -7,14 +7,21 @@ using System.Collections;
 public class PlaneMovement : MonoBehaviour {
 
     /// <summary>
+    /// A list of all the movement cards that can be played on the plane.
+    /// </summary>
+    public enum Cards
+    {
+        LeftTurnSharp,
+        LeftTurnLong,
+        StraightLong,
+        RightTurnSharp,
+        RightTurnLong,
+    };
+
+    /// <summary>
     /// The speed at which the plane travels every frame.
     /// </summary>
     public float moveSpeed = 10.0f;
-
-    /// <summary>
-    /// A list of target to fly towards in, in the order provided.
-    /// </summary>
-    public Transform [] targets = new Transform[2];
 
     /// <summary>
     /// When at the furthest point from the target, this will be
@@ -48,6 +55,15 @@ public class PlaneMovement : MonoBehaviour {
     public Transform childForBanking;
 
     /// <summary>
+    /// Template used for defining the path of a particular flight pattern.
+    /// </summary>
+    public GameObject leftTurnSharpTemplate;
+    public GameObject leftTurnLongTemplate;
+    public GameObject straightLongTemplate;
+    public GameObject rightTurnSharpTemplate;
+    public GameObject rightTurnLongTemplate;
+
+    /// <summary>
     /// Tracks which target is currently being flown to. This
     /// is an index into targets.
     /// </summary>
@@ -64,14 +80,29 @@ public class PlaneMovement : MonoBehaviour {
     /// </summary>
     private float distFromPreviousToCurrent = 0.0f;
 
-    private bool hasTarget = true;
+    /// <summary>
+    /// Tracks whether or not a target is currently set to avoid movement
+    /// after the target has been reached.
+    /// </summary>
+    private bool hasTarget = false;
+
+    /// <summary>
+    /// The position we are move towards.
+    /// </summary>
+    private Transform currentTarget;
+
+    /// <summary>
+    /// The card last spawned to control the plane movement. Needed so that
+    /// we can clean it up afterwards.
+    /// </summary>
+    private GameObject currentTargetGO;
     
     /// <summary>
     /// Start this instance.
     /// </summary>
     void Start( )
     {
-        distFromPreviousToCurrent = Vector3.Distance(transform.position, targets[currentTargetIndex].position);
+        //distFromPreviousToCurrent = Vector3.Distance(transform.position, targets[currentTargetIndex].position);
     }
 
     /// <summary>
@@ -86,7 +117,7 @@ public class PlaneMovement : MonoBehaviour {
         }
 
         // Get the current target.
-        Transform currentTarget = targets[currentTargetIndex];
+        //Transform currentTarget = targets[currentTargetIndex];
         
         // Get a vector from the current position to the target.
         // This is the vector we want to move our forward vector towards.
@@ -132,23 +163,77 @@ public class PlaneMovement : MonoBehaviour {
         // If we get close to the target, switch to the next target.
         if( Vector3.Distance(transform.position, currentTarget.position) < minDist )
         {
+            // Clean up the object we spawned.
+            Destroy ( currentTargetGO );
+
+            // We have reached the target so stop trying to fly towards it.
             hasTarget = false;
         }
     }
 
-    public void AdvanceTarget( )
+    /// <summary>
+    /// Plays a card causing the play to fly in a certain path.
+    /// </summary>
+    /// <param name='card'>
+    /// The card that is being played.
+    /// </param>
+    public void PlayCard(Cards card)
     {
-        hasTarget = true;
+        // We use prefabs to control the plane movement. Each card has an
+        // associated prefab contaning a "Target" GameObject in the position
+        // that the plane should be at come the end of the turn. Based on
+        // which card is being played, we spawn a different prefab.
+        GameObject template;
 
-        currentTargetIndex++;
-
-        // Loop around to the first target when reaching the end of the list.
-        if( currentTargetIndex >= targets.Length )
+        switch( card )
         {
-            currentTargetIndex = 0;
+            case Cards.LeftTurnSharp:
+            {
+                template = leftTurnSharpTemplate;
+                break;
+            }
+            case Cards.LeftTurnLong:
+            {
+                template = leftTurnLongTemplate;
+                break;
+            }
+            case Cards.StraightLong:
+            {
+                template = straightLongTemplate;
+                break;
+            }
+            case Cards.RightTurnSharp:
+            {
+                template = rightTurnSharpTemplate;
+                break;
+            }
+            case Cards.RightTurnLong:
+            {
+                template = rightTurnLongTemplate;
+                break;
+            }
+            default:
+            {
+                Debug.LogError( "Attempting to play unknown card: " + card.ToString( ) );
+
+                template = leftTurnLongTemplate;
+
+                break;
+            }
         }
 
+        // Create the prefab we deterined is needed for this card. Store a reference
+        // to it so that we can manually destroy it at the appropriate time.
+        currentTargetGO = Instantiate(template, transform.position, transform.rotation) as GameObject;
+
+        // Every prefab must have a child called "Target" at the position that the plane
+        // should try to be at come the end of the turn.
+        currentTarget = currentTargetGO.transform.Find("Target");
+
         // We have a new target so update to distance stored.
-        distFromPreviousToCurrent = Vector3.Distance(transform.position, targets[currentTargetIndex].position);
+        distFromPreviousToCurrent = Vector3.Distance(transform.position, currentTarget.position);
+
+        // Start trying to reach the new target.
+        hasTarget = true;
     }
 }
