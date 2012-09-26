@@ -1,1 +1,3 @@
-Actually it should be more like this.
+This project has moved to Google Code:
+
+http://code.google.com/p/mbhwings/
